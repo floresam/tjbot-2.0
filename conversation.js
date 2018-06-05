@@ -33,6 +33,12 @@ var hardware = ['microphone', 'speaker', 'led', 'servo', 'camera'];
 var tjConfig = {
     log: {
         level: 'verbose'
+    },
+    speak: { speakerDeviceId: 'plughw:0,0'},
+    listen: { 
+	microphoneDeviceId: 'plughw:1,0',
+	inactivityTimeout: -1,
+	language: 'en-US'
     }
 };
 
