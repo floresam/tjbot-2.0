@@ -58,17 +58,30 @@ tj.converse(WORKSPACEID, "hi", function(response) {
 var greeter = "off";
 var greetCount = 0;
 tj.shine("off");
+function contains(str, prefix)
+{
+	return str.index(prefix);
+}
 // listen for utterances with our attentionWord and send the result to
 // the Conversation service
 tj.listen(function(msg) {
     // check to see if they are talking to TJBot
-    if (msg.startsWith(tj.configuration.robot.name)) {
+    //if (msg.startsWith(tj.configuration.robot.name)) {
+    var index = msg.indexOf(tj.configuration.robot.name);
+    console.log(tj.configuration.robot.name);
+    console.log(msg);
+    console.log(index);
+    if (index > -1) {
         // remove our name from the message
-        var turn = msg.toLowerCase().replace(tj.configuration.robot.name.toLowerCase(), "");
+        //var turn = msg.toLowerCase().replace(tj.configuration.robot.name.toLowerCase(), "");
+        // remove our name & noise from the message
+        var turn = msg.toLowerCase().substring(0, index);
+        turn = msg.toLowerCase().replace(tj.configuration.robot.name.toLowerCase(), "");
 
         // send to the conversation service
         tj.converse(WORKSPACEID, turn, function(response) {
 	    console.log(tj._conversationContext[WORKSPACEID].number_greeted);
+            tj.pauseListening();
             // speak the result
             tj.speak(response.description);
 	    console.log(response.object.output);
@@ -76,6 +89,10 @@ tj.listen(function(msg) {
 	        var action = response.object.output.action;
 		if(action.light) {
 		    tj.shine(action.light);
+		}
+                if(action.salute) {
+		    if(action.salute == "on") { tj.raiseArm(); }
+		    else if (action.salute == "off") { tj.lowerArm(); }
 		}
 		if(action.wave) {
 	            tj.wave();
@@ -99,7 +116,9 @@ tj.listen(function(msg) {
 			tj.converse(WORKSPACEID, "", function(response) {
 			    //console.log(tj._conversationContext[WORKSPACEID].last_seen);
 			    // speak the result
-			    tj.speak(response.description);
+                            setTimeout(function() {
+			      tj.speak(response.description);
+			    }, 3000);
 			    //console.log(response.object.output);
 			});
                     }).catch(function(err) {
@@ -108,6 +127,7 @@ tj.listen(function(msg) {
                 }
 	        console.log(JSON.stringify(action));
 	    }
+            tj.resumeListening();
 	    //console.log(JSON.stringify(response.object.output));
         });
     }
