@@ -80,7 +80,7 @@ tj.listen(function(msg) {
 
         // send to the conversation service
         tj.converse(WORKSPACEID, turn, function(response) {
-	    console.log(tj._conversationContext[WORKSPACEID].number_greeted);
+	    console.log(tj._assistantContext[WORKSPACEID].number_greeted);
             tj.pauseListening();
             // speak the result
             tj.speak(response.description);
@@ -96,25 +96,55 @@ tj.listen(function(msg) {
 		}
 		if(action.wave) {
 	            tj.wave();
-		    tj._conversationContext[WORKSPACEID].number_greeted+= 1;
+		    tj._assistantContext[WORKSPACEID].number_greeted+= 1;
 		    //greeter = action.wave;
+		}
+		if(action.salute) {
+		    if(action.salute === "on") {
+	                tj.raiseArm();
+		    } else {
+	                tj.lowerArm();
+		    }
 		}
 		if(action.see) {
                     console.log("Attempting to see!");
                     tj.see().then(function(objects) {
-                        console.log(JSON.stringify(objects));
                         //console.log(objects[0]);
 			objects.sort(function(a,b){ return b.score -a.score; });
                         console.log(JSON.stringify(objects));
-			tj._conversationContext[WORKSPACEID].last_seen = objects;
+			tj._assistantContext[WORKSPACEID].last_seen = objects;
 			var classes = [];
                         for(var i=0; i<objects.length; i++) {
 			    classes[i] = objects[i].class;
                         }
-		        tj._conversationContext[WORKSPACEID].last_seen = classes;
+		        tj._assistantContext[WORKSPACEID].last_seen = classes;
 			// send to the conversation service
 			tj.converse(WORKSPACEID, "", function(response) {
-			    //console.log(tj._conversationContext[WORKSPACEID].last_seen);
+			    //console.log(tj._assistantContext[WORKSPACEID].last_seen);
+			    // speak the result
+                            setTimeout(function() {
+			      tj.speak(response.description);
+			    }, 3000);
+			    //console.log(response.object.output);
+			});
+                    }).catch(function(err) {
+			console.log(JSON.stringify(err));
+		    });
+                }
+		if(action.hvt) {
+                    console.log("Attempting to see hvts!");
+                    tj.seehvt().then(function(objects) {
+			objects.sort(function(a,b){ return b.score -a.score; });
+                        console.log(JSON.stringify(objects));
+			tj._assistantContext[WORKSPACEID].last_seen = objects;
+			var classes = [];
+                        for(var i=0; i<objects.length; i++) {
+			    classes[i] = objects[i].class;
+                        }
+		        tj._assistantContext[WORKSPACEID].last_seen = classes;
+			// send to the conversation service
+			tj.converse(WORKSPACEID, "", function(response) {
+			    //console.log(tj._assistantContext[WORKSPACEID].last_seen);
 			    // speak the result
                             setTimeout(function() {
 			      tj.speak(response.description);
@@ -134,8 +164,8 @@ tj.listen(function(msg) {
     if(greeter == "on") {
         tj.pauseListening();
         tj.wave();
-        tj._conversationContext[WORKSPACEID].number_greeted+= 1;
-        console.log(JSON.stringify(tj._conversationContext[WORKSPACEID].number_greeted));
+        tj._assistantContext[WORKSPACEID].number_greeted+= 1;
+        console.log(JSON.stringify(tj._assistantContext[WORKSPACEID].number_greeted));
         tj.resumeListening();
     }
 });

@@ -13,7 +13,7 @@ exports.credentials = {};
 
 // Watson Conversation
 // https://www.ibm.com/watson/developercloud/conversation.html
-exports.credentials.conversation = {
+exports.credentials.assistant = {
 	password: '',
 	username: ''
 };
@@ -30,4 +30,7 @@ exports.credentials.speech_to_text = {
 exports.credentials.text_to_speech = {
 	password: '',
 	username: ''
+};
+exports.credentials.visual_recognition = {
+	iam_apikey: ''
 };
